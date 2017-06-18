@@ -1,2 +1,8 @@
 packages/
 .vs/
+
+Monitor/bin/
+Monitor/obj/
+
+Persistence/bin/
+Persistence/obj/
