@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Persistence;
 
 namespace Monitor
 {
@@ -18,7 +15,7 @@ namespace Monitor
 
         void PersistData()
         {
-            Persistence.GetInstance().PersistRecordList(Records);
+            DB.GetInstance().PersistRecordList(Records);
         }
 
         public bool AddRecord(Process process)
