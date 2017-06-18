@@ -9,3 +9,6 @@ Persistence/obj/
 
 GUI/bin/
 GUI/obj/
+
+MonitorTests/bin/
+MonitorTests/obj/
