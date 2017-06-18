@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Threading;
 
 namespace Monitor
 {
@@ -11,7 +12,8 @@ namespace Monitor
     {
 
         class WindowMonitorConfig
-        {
+        {            
+
             public List<string> AllowPolling { get; set; }
             public int HowManyChangesBeforeDiskWrite { get; set; }
             public int PollingSleep { get; set; }
@@ -36,6 +38,7 @@ namespace Monitor
         Process CurrentProcess;
         RecordCollection RecordCollection;
         User32.WinEventDelegate Callback;
+        //Mutex Mutex = new Mutex();
 
         public WindowMonitor(string configFile)
         {
@@ -58,18 +61,11 @@ namespace Monitor
         }
 
 
-  
+        
         void UpdateProcess()
         {
             CurrentProcess = User32.GetForegroundProcess();
-            WindowRecord record = new WindowRecord(CurrentProcess);
-
-            if (RecordCollection.AddRecord(record))
-            {
-                Console.WriteLine(record);
-                Console.WriteLine("-----------------");
-            }
-                   
+            RecordCollection.AddRecord(CurrentProcess);       
         }
 
     }       

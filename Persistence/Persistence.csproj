@@ -64,8 +64,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DB.cs" />
+    <Compile Include="ProcessModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="WindowRecord.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

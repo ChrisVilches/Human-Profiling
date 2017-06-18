@@ -2,6 +2,7 @@
 using System.IO;
 using System.Data;
 using System.Data.SQLite;
+using System;
 
 namespace Persistence
 {
@@ -25,17 +26,26 @@ namespace Persistence
             }
             return Instance;
         }
-
-        public void PersistRecordList(List<WindowRecord> list)
+        
+    
+        public void PersistRecordList(List<ProcessModel> processList, List<DateTime> dateTimes, List<long> seconds)
         {
-            using (SQLiteCommand cmd = new SQLiteCommand("INSERT INTO window (process_name, process_title, date_time, seconds_used) VALUES (@Name, @Title, @Time);", Conn))
+
+            if(processList.Count != dateTimes.Count || dateTimes.Count != seconds.Count)
+            {
+                throw new InvalidOperationException("Wrong list length");
+            }
+
+            using (SQLiteCommand cmd = new SQLiteCommand("INSERT INTO window (process_name, process_title, date_time, seconds_used) VALUES (@Name, @Title, @Time, @Seconds);", Conn))
             using (SQLiteTransaction transaction = Conn.BeginTransaction())
             {
-                foreach (WindowRecord record in list)
+
+                for(int i=0; i<processList.Count; i++)
                 {
-                    cmd.Parameters.Add(new SQLiteParameter("@Name", record.Process.ProcessName));
-                    cmd.Parameters.Add(new SQLiteParameter("@Title", record.Process.MainWindowTitle));
-                    cmd.Parameters.Add(new SQLiteParameter("@Time", DbType.DateTime) { Value = record.DateTime });
+                    cmd.Parameters.Add(new SQLiteParameter("@Name", processList[i].Name));
+                    cmd.Parameters.Add(new SQLiteParameter("@Title", processList[i].Title));
+                    cmd.Parameters.Add(new SQLiteParameter("@Time", DbType.DateTime) { Value = dateTimes[i] });
+                    cmd.Parameters.Add(new SQLiteParameter("@Seconds", DbType.Double) { Value = seconds[i] });
                     cmd.ExecuteNonQuery();
                 }
 
