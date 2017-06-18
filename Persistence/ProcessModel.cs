@@ -25,5 +25,15 @@ namespace Persistence
             string result = String.Format("({0}, {1}) {2}", Id, Name, Title);
             return result;
         }
+
+        public override bool Equals(object o)
+        {
+            if (o == null) return false;
+
+            return this.Id == ((ProcessModel)o).Id &&
+                this.Name.Equals(((ProcessModel)o).Name) &&
+                this.Title.Equals(((ProcessModel)o).Title);
+        }
+
     }
 }

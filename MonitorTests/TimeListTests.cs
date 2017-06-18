@@ -2,6 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Monitor;
 using System.Diagnostics;
+using System.Collections.Generic;
 
 namespace MonitorTests
 {
@@ -106,6 +107,63 @@ namespace MonitorTests
             Assert.AreEqual(list.SecondsAt(1), 3);
             Assert.AreEqual(list.SecondsAt(2), 6);
         }
+
+
+        [TestMethod]
+        public void TimeList_AdjacentDifferent()
+        {
+            int size = 10000;
+            TimeList<Nullable<int>> list = new TimeList<Nullable<int>>(size);
+
+            Random r = new Random();
+
+            for(int i=0; i<size; i++)
+            {
+                int n = r.Next(1, 10);
+                list.Add(n);
+            }
+
+            Assert.IsTrue(list.ValidateAdjacentDifferent());
+        }
+
+        [TestMethod]
+        public void TimeList_AdjacentDifferent2()
+        {
+            TimeList<Nullable<int>> list = new TimeList<Nullable<int>>(10);
+
+            list.Add(2);
+            list.Add(3);
+            list.Add(2);
+            list.Add(2);
+            list.Add(2);
+            list.Add(2);
+            list.Add(2);
+            list.Add(2);
+            list.Add(2);
+            list.Add(2);
+            list.Add(2);
+
+            Assert.AreEqual(list.Count, 2);
+        }
+
+        [TestMethod]
+        public void TimeList_AddReturnBoolean()
+        {
+            TimeList<Nullable<int>> list = new TimeList<Nullable<int>>(10);
+
+            Assert.IsFalse(list.Add(1));
+            Assert.IsFalse(list.Add(1));
+            Assert.IsTrue(list.Add(2));
+            Assert.IsFalse(list.Add(2));
+            Assert.IsTrue(list.Add(3));
+            Assert.IsTrue(list.Add(4));
+            Assert.IsTrue(list.Add(5));
+
+            Assert.AreEqual(list.Count, 4);
+
+
+        }
+
 
     }
 }

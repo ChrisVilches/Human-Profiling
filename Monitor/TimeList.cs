@@ -9,7 +9,7 @@ namespace Monitor
 {
     public class TimeList<T>
     {
-        List<Tuple<T, long>> List;        
+        List<Tuple<T, long>> List;
         T WaitingToBeAdded;
         bool SomethingHasBeenAdded = false;
         DateTime LastTime;
@@ -51,8 +51,11 @@ namespace Monitor
             List.Clear();
         }
 
-        public void Add(T value, DateTime addTime)
+        public bool Add(T value, DateTime addTime)
         {
+            if (value.Equals(WaitingToBeAdded))
+                return false;
+
             T addNow = WaitingToBeAdded;
             WaitingToBeAdded = value;
 
@@ -62,15 +65,17 @@ namespace Monitor
             if (!SomethingHasBeenAdded)
             {
                 SomethingHasBeenAdded = true;
-                return;
-            }                    
+                return false;
+            }
 
+            Console.WriteLine("Se agrega a la lista el que estaba esperando {0}", addNow);
             List.Add(new Tuple<T, long>(addNow, seconds));
+            return true;
         }
 
-        public void Add(T value)
+        public bool Add(T value)
         {
-            Add(value, DateTime.Now);
+            return Add(value, DateTime.Now);
         }
 
         public List<T> GetElementsList()
@@ -91,6 +96,17 @@ namespace Monitor
                 l.Add(t.Item2);
             }
             return l;
+        }
+
+
+        public bool ValidateAdjacentDifferent()
+        {
+            for(int i=0; i<Count-1; i++)
+            {
+                if (List[i].Item1.Equals(List[i + 1].Item1))
+                    return false;
+            }
+            return true;
         }
 
     }

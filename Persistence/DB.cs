@@ -63,7 +63,7 @@ namespace Persistence
 
             if (createTable)
             {
-                string sql = @"CREATE TABLE window(id INTEGER PRIMARY KEY AUTOINCREMENT, process_name VARCHAR(32), process_title VARCHAR(64), date_time DATETIME);";
+                string sql = @"CREATE TABLE window(id INTEGER PRIMARY KEY AUTOINCREMENT, process_name VARCHAR(32), process_title VARCHAR(64), date_time DATETIME, seconds_used INTEGER);";
                 SQLiteCommand cmd = new SQLiteCommand(sql, Conn);
                 cmd.ExecuteNonQuery();
             }            

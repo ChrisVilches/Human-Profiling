@@ -35,10 +35,8 @@ namespace Monitor
 
         
         WindowMonitorConfig Config;
-        Process CurrentProcess;
         RecordCollection RecordCollection;
         User32.WinEventDelegate Callback;
-        //Mutex Mutex = new Mutex();
 
         public WindowMonitor(string configFile)
         {
@@ -56,17 +54,17 @@ namespace Monitor
             Callback = new User32.WinEventDelegate(UpdateProcess);
 
             User32.SetClickHook(Callback);
-            User32.SetForegroundHook(Callback);
             UpdateProcess();
         }
 
 
-        
         void UpdateProcess()
-        {
-            CurrentProcess = User32.GetForegroundProcess();
-            RecordCollection.AddRecord(CurrentProcess);       
+        {            
+            ProcessModel proc = new ProcessModel(User32.GetForegroundProcess());
+            Console.WriteLine("callback... {0}", proc);
+            RecordCollection.AddRecord(proc);
         }
+
 
     }       
 

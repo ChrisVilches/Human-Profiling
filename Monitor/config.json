@@ -1,5 +1,5 @@
 ﻿{
-    "HowManyChangesBeforeDiskWrite":  50,
+    "HowManyChangesBeforeDiskWrite":  55,
     "AllowPolling": [ "chrome.exe", "facebook.exe" ],
     "PollingSleep": 2000
 }
