@@ -13,7 +13,7 @@ namespace Persistence
         public static DB Instance;
 
         DB()
-        {          
+        {
         }
 
         public static DB GetInstance()
@@ -28,7 +28,7 @@ namespace Persistence
 
         public void PersistRecordList(List<WindowRecord> list)
         {
-            using (SQLiteCommand cmd = new SQLiteCommand("INSERT INTO window (process_name, process_title, date_time) VALUES (@Name, @Title, @Time);", Conn))
+            using (SQLiteCommand cmd = new SQLiteCommand("INSERT INTO window (process_name, process_title, date_time, seconds_used) VALUES (@Name, @Title, @Time);", Conn))
             using (SQLiteTransaction transaction = Conn.BeginTransaction())
             {
                 foreach (WindowRecord record in list)
@@ -57,8 +57,19 @@ namespace Persistence
                 SQLiteCommand cmd = new SQLiteCommand(sql, Conn);
                 cmd.ExecuteNonQuery();
             }            
-            
+        }
+
+        /// <summary>
+        /// Counts how many times each process has been switched to. The return is something like: chrome (100), mirc (58), git (12). But this doesn't mean Chrome
+        /// is the most used process, it's only the one that has more switches to it.
+        /// </summary>
+        /// <returns></returns>
+        public object SelectProcessCount()
+        {
+            string sql = "SELECT COUNT(id) AS count, process_name FROM window GROUP BY process_name ORDER BY count DESC;";
+            return null;
         }
 
     }
 }
+

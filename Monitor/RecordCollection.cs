@@ -11,6 +11,7 @@ namespace Monitor
         public RecordCollection(int capacity)
         {
             Records = new List<WindowRecord>(capacity);
+
         }
 
         void PersistData()
@@ -40,7 +41,5 @@ namespace Monitor
             Records.Add(windowRecord);
             return true;
         }
-
-
     }
 }

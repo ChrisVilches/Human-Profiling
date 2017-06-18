@@ -7,7 +7,7 @@ using System.IO;
 
 namespace Monitor
 {
-    class WindowMonitor
+    public class WindowMonitor
     {
 
         class WindowMonitorConfig
@@ -22,7 +22,7 @@ namespace Monitor
                 {
                     throw new ArgumentOutOfRangeException("Polling sleep time too low, " + PollingSleep + "ms");
                 }
-
+                
                 if (HowManyChangesBeforeDiskWrite < 50)
                 {
                     throw new ArgumentOutOfRangeException("In order to improve performance, there must be a number of window changes that are stored in memory before writing to disk. Number " + HowManyChangesBeforeDiskWrite + " is too low.");
