@@ -61,7 +61,6 @@ namespace Monitor
         void UpdateProcess()
         {            
             ProcessModel proc = new ProcessModel(User32.GetForegroundProcess());
-            Console.WriteLine("callback... {0}", proc);
             RecordCollection.AddRecord(proc);
         }
 

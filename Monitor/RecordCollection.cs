@@ -35,7 +35,7 @@ namespace Monitor
         public bool AddRecord(ProcessModel proc)
         {
 
-            if (Records.ShouldFlushBeforeAdding())
+            if (!Records.CanAdd(proc))
             {
                 PersistData();
                 Records.Clear();
@@ -44,9 +44,10 @@ namespace Monitor
 
             if (Records.Add(proc))
             {
-                Console.WriteLine("#{0} {1}", Records.Count, proc);
+                Console.WriteLine("#{0} {1}", Records.Count - 1, proc);
                 TimeProcess.Add(DateTime.Now);
-            }            
+            }
+            
 
             Debug.Assert(Records.ValidateAdjacentDifferent());
 

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,10 +8,10 @@ namespace Monitor
 {
     public class TimeList<T>
     {
+
         List<Tuple<T, long>> List;
-        T WaitingToBeAdded;
-        bool SomethingHasBeenAdded = false;
-        DateTime LastTime;
+        DateTime LastAdd;
+
         public int Count
         {
             get
@@ -35,15 +34,49 @@ namespace Monitor
         }
 
 
-        public TimeList(int capacity)
+        /// <summary>
+        /// Get list of seconds used by each process.
+        /// </summary>
+        /// <param name="fillWith">Usually you'd use DateTime.Now so it completes the used time by the last process up to now.</param>
+        public List<long> GetSecondsList(DateTime fillWith)
+        {
+            List<long> l = new List<long>();
+            foreach (Tuple<T, long> t in List)
+            {
+                l.Add(t.Item2);
+            }
+
+            if (l.Count > 0)
+                l[l.Count - 1] += (long)(fillWith - LastAdd).TotalSeconds;
+
+            return l;
+        }
+
+        public List<T> GetElementsList()
+        {
+            List<T> l = new List<T>();
+            foreach (Tuple<T, long> t in List)
+            {
+                l.Add(t.Item1);
+            }
+            return l;
+        }
+
+
+        public List<long> GetSecondsList()
+        {
+            return GetSecondsList(DateTime.Now);
+        }
+
+
+        public TimeList(int capacity, DateTime lastAdd)
         {
             List = new List<Tuple<T, long>>(capacity);
-            LastTime = DateTime.Now;
+            LastAdd = lastAdd;
         }
-        
-        public bool ShouldFlushBeforeAdding()
+
+        public TimeList(int capacity) : this(capacity, DateTime.Now)
         {
-            return List.Capacity == List.Count;
         }
 
         public void Clear()
@@ -51,26 +84,34 @@ namespace Monitor
             List.Clear();
         }
 
+
+        T GetLast()
+        {
+            if(Count == 0) return default(T);
+            return this[Count - 1];
+        }
+
         public bool Add(T value, DateTime addTime)
         {
-            if (value.Equals(WaitingToBeAdded))
-                return false;
+            bool add = false;
 
-            T addNow = WaitingToBeAdded;
-            WaitingToBeAdded = value;
-
-            long seconds = (long)(addTime - LastTime).TotalSeconds;
-            LastTime = addTime;
-
-            if (!SomethingHasBeenAdded)
+            if(Count > 0)
             {
-                SomethingHasBeenAdded = true;
-                return false;
+                long seconds = List[Count - 1].Item2;
+                long extraSeconds = (long)(addTime - LastAdd).TotalSeconds;
+                List[Count - 1] = new Tuple<T, long>(GetLast(), seconds + extraSeconds);
+            }
+            
+            if (!value.Equals(GetLast()))
+            {
+                List.Add(new Tuple<T, long>(value, 0));
+                add = true;
             }
 
-            Console.WriteLine("Se agrega a la lista el que estaba esperando {0}", addNow);
-            List.Add(new Tuple<T, long>(addNow, seconds));
-            return true;
+            LastAdd = addTime;
+
+            return add;
+
         }
 
         public bool Add(T value)
@@ -78,36 +119,28 @@ namespace Monitor
             return Add(value, DateTime.Now);
         }
 
-        public List<T> GetElementsList()
+        public bool CanAdd(T value)
         {
-            List<T> l = new List<T>();
-            foreach(Tuple<T, long> t in List)
+            if(List.Capacity == Count)
             {
-                l.Add(t.Item1);
-            }
-            return l;
-        }
-
-        public List<long> GetSecondsList()
-        {
-            List<long> l = new List<long>();
-            foreach (Tuple<T, long> t in List)
+                if (GetLast().Equals(value)) return true;
+                return false;
+            } else
             {
-                l.Add(t.Item2);
+                return true;
             }
-            return l;
         }
-
 
         public bool ValidateAdjacentDifferent()
         {
-            for(int i=0; i<Count-1; i++)
+            for (int i = 0; i < Count - 1; i++)
             {
-                if (List[i].Item1.Equals(List[i + 1].Item1))
+                if (this[i].Equals(this[i + 1]))
                     return false;
             }
             return true;
         }
+
 
     }
 }
