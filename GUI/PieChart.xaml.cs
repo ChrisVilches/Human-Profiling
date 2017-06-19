@@ -27,8 +27,10 @@ namespace GUI
                 string.Format("{0} ({1:P})", chartPoint.Y, chartPoint.Participation);
 
             DataContext = this;
+            PieCollection = new SeriesCollection();
         }
 
+        public SeriesCollection PieCollection { get; set; }
         public Func<ChartPoint, string> PointLabel { get; set; }
 
     }

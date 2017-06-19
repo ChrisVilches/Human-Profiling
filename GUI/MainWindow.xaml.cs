@@ -16,6 +16,8 @@ using LiveCharts;
 using LiveCharts.Wpf;
 using Monitor;
 using Persistence;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace GUI
 {
@@ -23,51 +25,104 @@ namespace GUI
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window, INotifyPropertyChanged
     {
 
         WindowMonitor Monitor;
+        Analyzer ana;            
+
+        int _totalCount;
+        int _todayCount;
+        int _hourCount;
+
+        public int TotalCount
+        {
+            get
+            {
+                return _totalCount;
+            }
+            set
+            {
+                _totalCount = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        public int TodayCount
+        {
+            get
+            {
+                return _todayCount;
+            }
+            set
+            {
+                _todayCount = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        public int HourCount
+        {
+            get
+            {
+                return _hourCount;
+            }
+            set
+            {
+                _hourCount = value;
+                NotifyPropertyChanged();
+            }
+        }
 
         public MainWindow()
         {
             InitializeComponent();
             Monitor = new WindowMonitor("config.json");
-
-            Analyzer ana = new Analyzer();
-
-            Console.WriteLine("Cantidad total {0}", ana.CountAll());
-            Console.WriteLine("Cantidad hoy {0}", ana.CountToday());
-            Console.WriteLine("Cantidad esta hora {0}", ana.CountSince(DateTime.Now.AddHours(-1)));
-
-            Console.WriteLine("mas cambios:");
-            List<Tuple<string, int>> mostSwitched = ana.MostSwitchedProcess();            
-
-            for (int i=0; i < mostSwitched.Count; i++)
-            {
-                Console.WriteLine(mostSwitched[i]);
-            }
-
-            Console.WriteLine();
-            Console.WriteLine("mas uso en tiempo total:");
-            List<Tuple<string, int>> mostUsed = ana.MostUsedProcess();
-
-            for (int i = 0; i < mostUsed.Count; i++)
-            {
-                Console.WriteLine(mostUsed[i]);
-            }
-
-
+            ana = new Analyzer();
+            RefreshData();
+            DataContext = this;
         }
+
+        void BuildPieChart(PieChart chart, List<Tuple<string, int>> data)
+        {
+            chart.PieCollection.Clear();
+
+            foreach (Tuple<string, int> tuple in data)
+            {
+                chart.PieCollection.Add(new PieSeries
+                {
+                    Title = tuple.Item1,
+                    Values = new ChartValues<double> { tuple.Item2 },
+                    DataLabels = true,
+                    LabelPoint = SwitchPieChart.PointLabel
+                });
+            }
+        }
+
+        void RefreshData()
+        {
+            TotalCount = ana.CountAll();
+            TodayCount = ana.CountToday();
+            HourCount = ana.CountSince(DateTime.Now.AddHours(-1));
+            BuildPieChart(SwitchPieChart, ana.MostSwitchedProcess());
+            BuildPieChart(MostUsedChart, ana.MostUsedProcess());
+        }
+
 
         void Refresh_Click(object sender, EventArgs e)
         {
             Console.WriteLine("Click");
             Monitor.ForcePersistData();
+            RefreshData();
         }
 
 
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
     }
-    
-
-
 }
