@@ -17,12 +17,13 @@ namespace Monitor
         List<DateTime> TimeProcess;
 
         Mutex ListOperations;
+        int Capacity;
 
         public RecordCollection(int capacity)
         {
-
-            Records = new TimeList<ProcessModel>(capacity);
-            TimeProcess = new List<DateTime>(capacity);
+            Capacity = capacity;
+            Records = new TimeList<ProcessModel>();
+            TimeProcess = new List<DateTime>();
             ListOperations = new Mutex();
         }
 
@@ -45,7 +46,7 @@ namespace Monitor
         {
             ListOperations.WaitOne();
 
-            if (!Records.CanAdd(proc))
+            if (Records.Count >= Capacity)
             {
                 PersistData();                
             }

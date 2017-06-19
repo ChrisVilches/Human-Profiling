@@ -52,6 +52,11 @@ namespace Monitor
             return l;
         }
 
+        public List<long> GetSecondsList()
+        {
+            return GetSecondsList(DateTime.Now);
+        }
+
         public List<T> GetElementsList()
         {
             List<T> l = new List<T>();
@@ -62,20 +67,14 @@ namespace Monitor
             return l;
         }
 
-
-        public List<long> GetSecondsList()
+           
+        public TimeList(DateTime lastAdd)
         {
-            return GetSecondsList(DateTime.Now);
-        }
-
-
-        public TimeList(int capacity, DateTime lastAdd)
-        {
-            List = new List<Tuple<T, long>>(capacity);
+            List = new List<Tuple<T, long>>();
             LastAdd = lastAdd;
         }
 
-        public TimeList(int capacity) : this(capacity, DateTime.Now)
+        public TimeList() : this(DateTime.Now)
         {
         }
 
@@ -117,18 +116,6 @@ namespace Monitor
         public bool Add(T value)
         {
             return Add(value, DateTime.Now);
-        }
-
-        public bool CanAdd(T value)
-        {
-            if(List.Capacity == Count)
-            {
-                if (GetLast().Equals(value)) return true;
-                return false;
-            } else
-            {
-                return true;
-            }
         }
 
         public bool ValidateAdjacentDifferent()

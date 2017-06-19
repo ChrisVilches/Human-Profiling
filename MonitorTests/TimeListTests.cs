@@ -11,7 +11,7 @@ namespace MonitorTests
         [TestMethod]
         public void TimeList_CorrectCount()
         {
-            TimeList<Nullable<int>> list = new TimeList<Nullable<int>>(20);
+            TimeList<Nullable<int>> list = new TimeList<Nullable<int>>();
 
             Assert.AreEqual(list.Count, 0);
 
@@ -34,7 +34,7 @@ namespace MonitorTests
         [TestMethod]
         public void TimeList_CorrectValues()
         {
-            TimeList<Nullable<int>> list = new TimeList<Nullable<int>>(20);
+            TimeList<Nullable<int>> list = new TimeList<Nullable<int>>();
 
             list.Add(11);
             list.Add(11);
@@ -65,7 +65,7 @@ namespace MonitorTests
         {
 
             DateTime now = new DateTime(2000, 3, 3, 3, 3, 3);
-            TimeList<Nullable<int>> list = new TimeList<Nullable<int>>(20, now);            
+            TimeList<Nullable<int>> list = new TimeList<Nullable<int>>(now);            
 
             list.Add(11, now);
             Assert.AreEqual(list.SecondsAt(0), 0);
@@ -107,7 +107,7 @@ namespace MonitorTests
         public void TimeList_TimeUpdate()
         {
             DateTime now = new DateTime(2000, 3, 3, 3, 3, 3);
-            TimeList<Nullable<int>> list = new TimeList<Nullable<int>>(20, now);
+            TimeList<Nullable<int>> list = new TimeList<Nullable<int>>(now);
 
             list.Add(11, now);
             Assert.AreEqual(list.SecondsAt(0), 0);
@@ -143,7 +143,7 @@ namespace MonitorTests
         public void TimeList_TimeUpdateStart_NotFromZero()
         {
             DateTime now = new DateTime(2000, 3, 3, 3, 3, 3);
-            TimeList<Nullable<int>> list = new TimeList<Nullable<int>>(20, now);
+            TimeList<Nullable<int>> list = new TimeList<Nullable<int>>(now);
 
             list.Add(11, now.AddSeconds(10));
             Assert.AreEqual(list.SecondsAt(0), 0);
@@ -163,55 +163,16 @@ namespace MonitorTests
         }
 
 
-        [TestMethod]
-        public void TimeList_CanAdd()
-        {
-            DateTime now = new DateTime(2000, 3, 3, 3, 3, 3);
-            TimeList<Nullable<int>> list = new TimeList<Nullable<int>>(3, now);
-
-            list.Add(11, now);
-            list.Add(22, now.AddSeconds(4));
-
-            Assert.IsTrue(list.CanAdd(22));
-            list.Add(22, now.AddSeconds(5));
-
-            Assert.IsTrue(list.CanAdd(22));
-            list.Add(22, now.AddSeconds(6));
-
-            Assert.IsTrue(list.CanAdd(33));
-            list.Add(33, now.AddSeconds(8));
-
-            Assert.IsTrue(list.CanAdd(33));
-            list.Add(33, now.AddSeconds(10));
-            list.Add(33, now.AddSeconds(15));
-            list.Add(33, now.AddSeconds(21));
-
-            Assert.AreEqual(list.Count, 3);
-
-            Assert.IsFalse(list.CanAdd(44));
-            Assert.IsFalse(list.CanAdd(55));
-            Assert.IsFalse(list.CanAdd(66));
-            Assert.IsFalse(list.CanAdd(11));
-            Assert.IsFalse(list.CanAdd(22));
-            Assert.IsTrue(list.CanAdd(33));
-
-            Assert.AreEqual(list.SecondsAt(0), 4);
-            Assert.AreEqual(list.SecondsAt(1), 4);
-            Assert.AreEqual(list.SecondsAt(2), 13);
-        }
-
 
         [TestMethod]
         public void TimeList_GetSecondsList()
         {
             DateTime now = new DateTime(2000, 3, 3, 3, 3, 3);
-            TimeList<Nullable<int>> list = new TimeList<Nullable<int>>(3, now);
+            TimeList<Nullable<int>> list = new TimeList<Nullable<int>>(now);
 
             list.Add(11, now.AddSeconds(5));
             list.Add(22, now.AddSeconds(6));
             list.Add(33, now.AddSeconds(11));           
-
-            Assert.IsFalse(list.CanAdd(44));
 
             List<long> seconds = list.GetSecondsList(now.AddSeconds(17));
 
@@ -224,14 +185,12 @@ namespace MonitorTests
         public void TimeList_GetSecondsList2()
         {
             DateTime now = new DateTime(2000, 3, 3, 3, 3, 3);
-            TimeList<Nullable<int>> list = new TimeList<Nullable<int>>(3, now);
+            TimeList<Nullable<int>> list = new TimeList<Nullable<int>>(now);
 
             list.Add(11, now.AddSeconds(5));
             list.Add(22, now.AddSeconds(6));
             list.Add(33, now.AddSeconds(11));
             list.Add(33, now.AddSeconds(16));
-
-            Assert.IsFalse(list.CanAdd(44));
 
             List<long> seconds = list.GetSecondsList(now.AddSeconds(17));
 
@@ -240,36 +199,15 @@ namespace MonitorTests
             Assert.AreEqual(seconds[2], 6);
         }
 
-        [TestMethod]
-        public void TimeList_GetSecondsListNotFull()
-        {
-            DateTime now = new DateTime(2000, 3, 3, 3, 3, 3);
-            TimeList<Nullable<int>> list = new TimeList<Nullable<int>>(10, now);
-
-            list.Add(11, now.AddSeconds(5));
-            list.Add(22, now.AddSeconds(6));
-            list.Add(33, now.AddSeconds(11));
-            list.Add(33, now.AddSeconds(16));
-
-            Assert.IsTrue(list.CanAdd(44));
-
-            List<long> seconds = list.GetSecondsList(now.AddSeconds(17));
-
-            Assert.AreEqual(list.Count, 3);
-            Assert.AreEqual(seconds[0], 1);
-            Assert.AreEqual(seconds[1], 5);
-            Assert.AreEqual(seconds[2], 6);
-        }
 
         [TestMethod]
         public void TimeList_AdjacentDifferent()
         {
-            int size = 10000;
-            TimeList<Nullable<int>> list = new TimeList<Nullable<int>>(size);
+            TimeList<Nullable<int>> list = new TimeList<Nullable<int>>();
 
             Random r = new Random();
 
-            for (int i = 0; i < size; i++)
+            for (int i = 0; i < 10000; i++)
             {
                 int n = r.Next(1, 10);
                 list.Add(n);
@@ -282,8 +220,7 @@ namespace MonitorTests
         public void TimeList_AddBoolean()
         {
 
-            TimeList<Nullable<int>> list = new TimeList<Nullable<int>>(20);
-
+            TimeList<Nullable<int>> list = new TimeList<Nullable<int>>();
 
             Assert.IsTrue(list.Add(11));
             Assert.IsFalse(list.Add(11));
@@ -294,7 +231,6 @@ namespace MonitorTests
             Assert.IsTrue(list.Add(44));
             Assert.IsTrue(list.Add(55));
             Assert.IsFalse(list.Add(55));
-
 
         }
 
