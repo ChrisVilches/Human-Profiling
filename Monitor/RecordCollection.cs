@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using Persistence;
 using System;
+using System.Threading;
 
 namespace Monitor
 {
@@ -15,31 +16,38 @@ namespace Monitor
         /// </summary>
         List<DateTime> TimeProcess;
 
+        Mutex ListOperations;
+
         public RecordCollection(int capacity)
         {
+
             Records = new TimeList<ProcessModel>(capacity);
             TimeProcess = new List<DateTime>(capacity);
+            ListOperations = new Mutex();
         }
 
-        void PersistData()
+        public void PersistData()
         {
+            ListOperations.WaitOne();
             Console.WriteLine("Escribiendo con SQLite");
             for(int i=0; i<Records.Count; i++)
             {
                 Console.WriteLine("--- {0} {1}", i, Records[i]);
             }
             DB.GetInstance().PersistRecordList(Records.GetElementsList(), TimeProcess, Records.GetSecondsList());
+            Records.Clear();
+            TimeProcess.Clear();
+            ListOperations.ReleaseMutex();
         }
 
 
-        public bool AddRecord(ProcessModel proc)
+        public void AddRecord(ProcessModel proc)
         {
+            ListOperations.WaitOne();
 
             if (!Records.CanAdd(proc))
             {
-                PersistData();
-                Records.Clear();
-                TimeProcess.Clear();
+                PersistData();                
             }
 
             if (Records.Add(proc))
@@ -48,11 +56,8 @@ namespace Monitor
                 TimeProcess.Add(DateTime.Now);
             }
             
-
             Debug.Assert(Records.ValidateAdjacentDifferent());
-
-
-            return true;
+            ListOperations.ReleaseMutex();
         }
     }
 }

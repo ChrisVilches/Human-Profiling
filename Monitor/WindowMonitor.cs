@@ -17,6 +17,7 @@ namespace Monitor
             public List<string> AllowPolling { get; set; }
             public int HowManyChangesBeforeDiskWrite { get; set; }
             public int PollingSleep { get; set; }
+            public int WriteDiskIntervalMinutes { get; set; }
 
             public void validateConfig()
             {
@@ -29,6 +30,11 @@ namespace Monitor
                 {
                     throw new ArgumentOutOfRangeException("In order to improve performance, there must be a number of window changes that are stored in memory before writing to disk. Number " + HowManyChangesBeforeDiskWrite + " is too low.");
                 }
+
+                if (WriteDiskIntervalMinutes < 1)
+                {
+                    throw new ArgumentOutOfRangeException("Writing to disk every " + WriteDiskIntervalMinutes + " minutes is too often.");
+                }
             }
         }
 
@@ -37,6 +43,7 @@ namespace Monitor
         WindowMonitorConfig Config;
         RecordCollection RecordCollection;
         User32.WinEventDelegate Callback;
+        Thread PersistInterval;
 
         public WindowMonitor(string configFile)
         {
@@ -51,10 +58,28 @@ namespace Monitor
             /* Memory before writing to disk */
             RecordCollection = new RecordCollection(Config.HowManyChangesBeforeDiskWrite);
 
+            PersistInterval = new Thread(PersistIntervalJob);
+            PersistInterval.Start();
+
             Callback = new User32.WinEventDelegate(UpdateProcess);
 
             User32.SetClickHook(Callback);
             UpdateProcess();
+        }
+
+        void PersistIntervalJob()
+        {
+            while (true)
+            {
+                Thread.Sleep(Config.WriteDiskIntervalMinutes * 60 * 1000);
+                Console.WriteLine("{0} Writing to disk (SQLite)", DateTime.Now);
+                ForcePersistData();                
+            }
+        }
+
+        public void ForcePersistData()
+        {
+            RecordCollection.PersistData();
         }
 
 

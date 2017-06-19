@@ -36,6 +36,8 @@ namespace Persistence
                 throw new InvalidOperationException("Wrong list length");
             }
 
+            if (processList.Count == 0) return;
+
             using (SQLiteCommand cmd = new SQLiteCommand("INSERT INTO window (process_name, process_title, date_time, seconds_used) VALUES (@Name, @Title, @Time, @Seconds);", Conn))
             using (SQLiteTransaction transaction = Conn.BeginTransaction())
             {
@@ -69,17 +71,37 @@ namespace Persistence
             }            
         }
 
-        /// <summary>
-        /// Counts how many times each process has been switched to. The return is something like: chrome (100), mirc (58), git (12). But this doesn't mean Chrome
-        /// is the most used process, it's only the one that has more switches to it.
-        /// </summary>
-        /// <returns></returns>
-        public object SelectProcessCount()
+        public SQLiteDataReader SelectQuery(string sql)
         {
-            string sql = "SELECT COUNT(id) AS count, process_name FROM window GROUP BY process_name ORDER BY count DESC;";
-            return null;
+            using (SQLiteCommand cmd = Conn.CreateCommand())
+            {
+                cmd.CommandText = sql;
+                cmd.CommandType = CommandType.Text;
+                return cmd.ExecuteReader();
+            }
         }
 
+        public int CountQuery(string sql)
+        {
+            return CountQuery(sql, null);
+        }
+
+        public int CountQuery(string sql, List<SQLiteParameter> parameters)
+        {
+            using (SQLiteCommand cmd = Conn.CreateCommand())
+            {
+                cmd.CommandText = sql;
+                
+                if(parameters != null)
+                {
+                    foreach(SQLiteParameter param in parameters)
+                    {
+                        cmd.Parameters.Add(param);
+                    }
+                }
+                return Convert.ToInt32(cmd.ExecuteScalar());
+            }
+        }
     }
 }
 

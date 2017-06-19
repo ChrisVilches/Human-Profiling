@@ -63,6 +63,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Analyzer.cs" />
     <Compile Include="DB.cs" />
     <Compile Include="ProcessModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
