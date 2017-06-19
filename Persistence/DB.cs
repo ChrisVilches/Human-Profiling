@@ -71,12 +71,20 @@ namespace Persistence
             }            
         }
 
-        public SQLiteDataReader SelectQuery(string sql)
+
+
+        public SQLiteDataReader SelectQuery(string sql, List<SQLiteParameter> parameters = null)
         {
             using (SQLiteCommand cmd = Conn.CreateCommand())
             {
                 cmd.CommandText = sql;
-                cmd.CommandType = CommandType.Text;
+                if (parameters != null)
+                {
+                    foreach (SQLiteParameter param in parameters)
+                    {
+                        cmd.Parameters.Add(param);
+                    }
+                }
                 return cmd.ExecuteReader();
             }
         }

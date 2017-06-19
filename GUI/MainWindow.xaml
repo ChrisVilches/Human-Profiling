@@ -12,6 +12,7 @@
 
 
         <Button Content="Refresh"
+                Name="RefreshButton"
                 HorizontalAlignment="Left"
                 Margin="10,10,0,0"
                 VerticalAlignment="Top"
@@ -22,25 +23,12 @@
 
         <local:PieChart x:Name="MostUsedChart" HorizontalAlignment="Left" VerticalAlignment="Top" Height="350" Width="350" Margin="500,50,0,0"/>
 
-        <Grid Margin="10,50,0,0" Width="350" HorizontalAlignment="Left">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="50" />
-            </Grid.ColumnDefinitions>
-            <Label Grid.Row="0" Grid.Column="0" Content="Total"/>
-            <Label Grid.Row="1" Grid.Column="0" Content="Today"/>
-            <Label Grid.Row="2" Grid.Column="0" Content="Hour"/>
-            <Label Grid.Row="0" Grid.Column="1" Content="{Binding TotalCount}"/>
-            <Label Grid.Row="1" Grid.Column="1" Content="{Binding TodayCount}"/>
-            <Label Grid.Row="2" Grid.Column="1" Content="{Binding HourCount}"/>
-
-        </Grid>
+        <local:Stats x:Name="Stats" Margin="10,50,0,0" Width="350" HorizontalAlignment="Left"></local:Stats>
+        
+        <DatePicker Name="StartTime" HorizontalAlignment="Left" Margin="150,10,0,0" VerticalAlignment="Top"/>
+        
+        <DatePicker Name="EndTime" HorizontalAlignment="Left" Margin="262,10,0,0" VerticalAlignment="Top"/>
+        
 
     </Grid>
 

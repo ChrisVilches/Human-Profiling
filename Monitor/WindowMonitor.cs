@@ -2,6 +2,7 @@
 using Persistence;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
@@ -43,7 +44,7 @@ namespace Monitor
         WindowMonitorConfig Config;
         RecordCollection RecordCollection;
         User32.WinEventDelegate Callback;
-        Thread PersistInterval;
+        BackgroundWorker PersistInterval;
 
         public WindowMonitor(string configFile)
         {
@@ -58,8 +59,9 @@ namespace Monitor
             /* Memory before writing to disk */
             RecordCollection = new RecordCollection(Config.HowManyChangesBeforeDiskWrite);
 
-            PersistInterval = new Thread(PersistIntervalJob);
-            PersistInterval.Start();
+            PersistInterval = new BackgroundWorker();
+            PersistInterval.DoWork += new DoWorkEventHandler(PersistIntervalJob);
+            PersistInterval.RunWorkerAsync();
 
             Callback = new User32.WinEventDelegate(UpdateProcess);
 
@@ -67,13 +69,18 @@ namespace Monitor
             UpdateProcess();
         }
 
-        void PersistIntervalJob()
+        void PersistIntervalJob(object sender, DoWorkEventArgs e)
         {
+            DateTime last = DateTime.Now;
+            Console.WriteLine("Background worker para escribir SQLite empezo a las {0}", last);
             while (true)
             {
                 Thread.Sleep(Config.WriteDiskIntervalMinutes * 60 * 1000);
                 Console.WriteLine("{0} Writing to disk (SQLite)", DateTime.Now);
-                ForcePersistData();                
+                Console.WriteLine("han pasado {0} min desde que se escribio por ultima vez", (DateTime.Now - last).TotalMinutes);
+                Debug.Assert(Math.Round((DateTime.Now - last).TotalMinutes) == Config.WriteDiskIntervalMinutes);
+                last = DateTime.Now;
+                ForcePersistData();
             }
         }
 

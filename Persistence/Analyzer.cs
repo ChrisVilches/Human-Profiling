@@ -21,30 +21,51 @@ namespace Persistence
         /// is the most used process, it's only the one that has more switches to it.
         /// </summary>
         /// <returns></returns>
-        public List<Tuple<string, int>> MostSwitchedProcess()
+        public List<Tuple<string, int>> MostSwitchedProcess(DateTime start, DateTime end)
         {
+            Console.WriteLine("most switched process, fechas {0} --> {1}", start, end);
+
             List<Tuple<string, int>> list = new List<Tuple<string, int>>();
-            string sql = "SELECT COUNT(id) AS count, process_name FROM window GROUP BY process_name ORDER BY count DESC;";
-            var data = DB.GetInstance().SelectQuery(sql);
+            string sql = "SELECT COUNT(id) AS count, process_name FROM window WHERE date_time > @Start AND date_time < @End GROUP BY process_name ORDER BY count DESC;";
+            List<SQLiteParameter> param = new List<SQLiteParameter>();
+            param.Add(new SQLiteParameter("@Start", DbType.DateTime) { Value = start });
+            param.Add(new SQLiteParameter("@End", DbType.DateTime) { Value = end });
+
+            var data = DB.GetInstance().SelectQuery(sql, param);
 
             while (data.Read())
             {
-               list.Add(new Tuple<string, int>((string)data["process_name"], Convert.ToInt32(data["count"])));
+                list.Add(new Tuple<string, int>((string)data["process_name"], Convert.ToInt32(data["count"])));
             }
             return list;
         }
 
-        public List<Tuple<string, int>> MostUsedProcess()
+        public List<Tuple<string, int>> MostSwitchedProcess()
+        {
+            return MostSwitchedProcess(new DateTime(1970, 1, 1, 1, 1, 1), DateTime.Now.AddDays(1));
+        }
+
+
+        public List<Tuple<string, int>> MostUsedProcess(DateTime start, DateTime end)
         {
             List<Tuple<string, int>> list = new List<Tuple<string, int>>();
-            string sql = "SELECT SUM(seconds_used) AS total_seconds, process_name FROM window GROUP BY process_name ORDER BY total_seconds DESC;";
-            var data = DB.GetInstance().SelectQuery(sql);
+            string sql = "SELECT SUM(seconds_used) AS total_seconds, process_name FROM window WHERE date_time > @Start AND date_time < @End GROUP BY process_name ORDER BY total_seconds DESC;";
+            List<SQLiteParameter> param = new List<SQLiteParameter>();
+            param.Add(new SQLiteParameter("@Start", DbType.DateTime) { Value = start });
+            param.Add(new SQLiteParameter("@End", DbType.DateTime) { Value = end });
+            var data = DB.GetInstance().SelectQuery(sql, param);
 
             while (data.Read())
             {
                 list.Add(new Tuple<string, int>((string)data["process_name"], Convert.ToInt32(data["total_seconds"])));
             }
             return list;
+        }
+
+
+        public List<Tuple<string, int>> MostUsedProcess()
+        {
+            return MostUsedProcess(new DateTime(1970, 1, 1, 1, 1, 1), DateTime.Now.AddDays(1));
         }
 
 

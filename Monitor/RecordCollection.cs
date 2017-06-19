@@ -30,7 +30,6 @@ namespace Monitor
         public void PersistData()
         {
             ListOperations.WaitOne();
-            Console.WriteLine("Escribiendo con SQLite");
             for(int i=0; i<Records.Count; i++)
             {
                 Console.WriteLine("--- {0} {1}", i, Records[i]);
@@ -48,6 +47,7 @@ namespace Monitor
 
             if (Records.Count >= Capacity)
             {
+                Console.WriteLine("Escribir con SQLite (se lleno la lista");
                 PersistData();                
             }
 
