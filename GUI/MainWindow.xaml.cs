@@ -24,7 +24,7 @@ namespace GUI
             InitializeComponent();
 
             StartTime.SelectedDate = DateTime.Now.AddDays(-1);
-            EndTime.SelectedDate = DateTime.Now;
+            EndTime.SelectedDate = DateTime.Now.AddDays(1);
 
             Monitor = new WindowMonitor("config.json");
             ana = new Analyzer();

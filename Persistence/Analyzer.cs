@@ -48,6 +48,7 @@ namespace Persistence
 
         public List<Tuple<string, int>> MostUsedProcess(DateTime start, DateTime end)
         {
+            Console.WriteLine("most used process, fechas {0} --> {1}", start, end);
             List<Tuple<string, int>> list = new List<Tuple<string, int>>();
             string sql = "SELECT SUM(seconds_used) AS total_seconds, process_name FROM window WHERE date_time > @Start AND date_time < @End GROUP BY process_name ORDER BY total_seconds DESC;";
             List<SQLiteParameter> param = new List<SQLiteParameter>();
